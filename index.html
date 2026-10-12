@@ -1,0 +1,874 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Gonzalo — De usar IA a construir con IA (V2)</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&amp;family=Geist+Mono:wght@400;500&amp;family=Instrument+Serif:ital@0;1&amp;display=swap">
+<style>
+body{margin:0;background:#06070A}
+a{color:#EDEBE6}a:hover{color:#fff}
+.x{--bg:#06070A;--bg2:#0B0C10;--ink:#EDEBE6;--muted:#8D8F95;--faint:rgba(237,235,230,.08);--line:rgba(237,235,230,.12);color:var(--ink);background:var(--bg);font-family:'Geist',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative}
+.x *{box-sizing:border-box}
+.mono{font-family:'Geist Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+.serif{font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-weight:400;letter-spacing:-.01em}
+.wrap{max-width:1280px;margin:0 auto;padding:0 40px;position:relative;z-index:2}
+.sec{position:relative;padding:160px 0}
+.kick{display:flex;align-items:center;gap:14px;color:var(--muted);margin-bottom:40px}
+.kick b{font-weight:500;color:var(--warm)}
+.kick i{display:block;width:48px;height:1px;background:linear-gradient(90deg,var(--cool),var(--warm))}
+.h2{font-size:clamp(44px,6vw,92px);line-height:.95;font-weight:600;letter-spacing:-.045em;margin:0}
+.h2 .serif{font-size:1.08em;color:var(--warm)}
+.lead{font-size:clamp(19px,1.7vw,24px);line-height:1.45;margin:0;color:var(--ink);font-weight:400;letter-spacing:-.01em}
+.body{font-size:17px;line-height:1.7;margin:0;color:#B9BAB6}
+.grad{background:linear-gradient(90deg,var(--cool),var(--warm));-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* ambient light */
+.glow{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;opacity:.22}
+.glow.c{background:var(--cool)}
+.glow.w{background:var(--warm)}
+.drift{animation:drift 18s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(60px,-40px) scale(1.15)}}
+
+/* particles */
+.parts{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.pt{position:absolute;width:2px;height:2px;border-radius:50%;background:#EDEBE6;opacity:0;animation-name:rise;animation-timing-function:linear;animation-iteration-count:infinite}
+@keyframes rise{0%{opacity:0;transform:translateY(0)}15%{opacity:.55}85%{opacity:.35}100%{opacity:0;transform:translateY(-140px)}}
+
+/* nav */
+.nav{display:flex;justify-content:space-between;align-items:center;padding:26px 0;position:relative;z-index:3}
+.nav-l{display:flex;align-items:center;gap:12px}
+.beacon{width:8px;height:8px;border-radius:50%;background:var(--warm);box-shadow:0 0 0 0 var(--warm);animation:beacon 2.2s ease-out infinite}
+@keyframes beacon{0%{box-shadow:0 0 0 0 rgba(255,122,69,.55)}100%{box-shadow:0 0 0 14px rgba(255,122,69,0)}}
+.navlinks{display:flex;gap:28px}
+.navlinks a{color:var(--muted);text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
+.navlinks a:hover{color:var(--ink)}
+
+/* hero */
+.hero{position:relative;min-height:100vh;padding-bottom:80px;overflow:hidden}
+.name{position:relative;display:inline-block;font-size:clamp(84px,19.5vw,300px);line-height:.82;font-weight:700;letter-spacing:-.065em;margin:56px 0 0;white-space:nowrap}
+.name .o{color:transparent;-webkit-text-stroke:1px rgba(237,235,230,.28)}
+.name .f{position:absolute;inset:0;color:var(--ink);clip-path:inset(0 100% 0 0);animation:build 2.8s cubic-bezier(.7,0,.2,1) .4s forwards}
+.name .scan{position:absolute;top:-4%;bottom:-4%;left:0;width:2px;background:var(--warm);box-shadow:0 0 28px 4px var(--warm);opacity:0;animation:scan 2.8s cubic-bezier(.7,0,.2,1) .4s forwards}
+@keyframes build{to{clip-path:inset(0 0 0 0)}}
+@keyframes scan{0%{left:0;opacity:1}92%{opacity:1}100%{left:100%;opacity:0}}
+.hero-row{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:56px;align-items:end;margin-top:36px}
+.sub{font-size:clamp(34px,4vw,60px);line-height:1;font-weight:500;letter-spacing:-.04em;margin:0}
+.sub .serif{color:var(--warm);font-size:1.1em}
+.meta{color:var(--muted);margin-top:22px}
+.cta{display:inline-flex;align-items:center;gap:14px;min-height:54px;padding:0 28px;border-radius:999px;background:var(--ink);color:#06070A;text-decoration:none;font-weight:600;font-size:16px;letter-spacing:-.01em;transition:gap .25s, box-shadow .25s}
+.cta:hover{gap:22px;color:#06070A;box-shadow:0 0 40px rgba(255,122,69,.35)}
+.cta.w{background:var(--warm);color:#140700}
+.cta.w:hover{color:#140700}
+.status{display:inline-flex;align-items:center;gap:10px;padding:8px 14px;border:1px solid var(--line);border-radius:999px;color:var(--ink);background:rgba(237,235,230,.03);backdrop-filter:blur(8px)}
+
+/* circuit */
+.circuit{position:relative;margin-top:72px}
+.circuit svg{display:block;width:100%;height:auto;overflow:visible}
+.c-base{fill:none;stroke:rgba(237,235,230,.10);stroke-width:1}
+.c-main{fill:none;stroke:url(#gline);stroke-width:1.5}
+.c-flow{fill:none;stroke:url(#gline);stroke-width:2;stroke-dasharray:2 16;stroke-linecap:round;animation:flow 1.6s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-18}}
+.c-thin{stroke:rgba(237,235,230,.13);stroke-width:1}
+.c-mini{fill:#EDEBE6;opacity:.5}
+.c-ring{fill:none;stroke:rgba(237,235,230,.35);stroke-width:1}
+.c-dash{fill:none;stroke-width:1;stroke-dasharray:3 6}
+.spin{transform-box:fill-box;transform-origin:center;animation:spin 14s linear infinite}
+.spin.r{animation-direction:reverse;animation-duration:22s}
+@keyframes spin{to{transform:rotate(360deg)}}
+.cube-ghost{fill:none;stroke:rgba(255,122,69,.22);stroke-width:1;stroke-dasharray:3 5}
+.cube{fill:none;stroke:var(--warm);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1 1;stroke-dashoffset:1;animation:draw 6s cubic-bezier(.6,0,.3,1) infinite}
+.cube.d2{animation-delay:.25s}
+.cube.d3{animation-delay:.5s}
+@keyframes draw{0%{stroke-dashoffset:1}45%,80%{stroke-dashoffset:0}100%{stroke-dashoffset:-1}}
+.cube-face{fill:var(--warm);opacity:0;animation:face 6s ease infinite}
+@keyframes face{0%,40%{opacity:0}55%,78%{opacity:.16}95%,100%{opacity:0}}
+.c-label{font-family:'Geist Mono',monospace;font-size:13px;letter-spacing:.14em;fill:#8D8F95}
+.c-here{font-family:'Geist Mono',monospace;font-size:12px;letter-spacing:.14em;fill:var(--warm)}
+.legend{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;margin-top:28px;border-top:1px solid var(--line);padding-top:24px}
+.legend h3{margin:8px 0 8px;font-size:28px;font-weight:600;letter-spacing:-.03em}
+.legend p{margin:0;font-size:15px;line-height:1.55;color:#A9AAA6;max-width:320px}
+.legend .mono{color:var(--muted)}
+.legend .now h3{color:var(--warm)}
+
+/* 01 morph */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:80px;align-items:center}
+.morph{position:relative;aspect-ratio:36/28;border-radius:28px;background:radial-gradient(120% 90% at 50% 100%,rgba(255,122,69,.08),transparent 60%),rgba(237,235,230,.02);border:1px solid var(--line);overflow:hidden}
+.morph-grid{position:absolute;inset:0;background-image:linear-gradient(var(--faint) 1px,transparent 1px),linear-gradient(90deg,var(--faint) 1px,transparent 1px);background-size:36px 36px;mask-image:radial-gradient(circle at 50% 50%,#000 30%,transparent 75%);-webkit-mask-image:radial-gradient(circle at 50% 50%,#000 30%,transparent 75%)}
+.md{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;transition:left 1.3s cubic-bezier(.7,0,.2,1), top 1.3s cubic-bezier(.7,0,.2,1), background 1.3s, box-shadow 1.3s, transform 1.3s}
+.phases{display:flex;justify-content:space-between;gap:8px;position:absolute;left:24px;right:24px;bottom:20px}
+.ph{color:#5E6066;transition:color .6s}
+.ph.on{color:var(--ink)}
+.verbs{display:flex;flex-wrap:wrap;gap:10px;margin-top:32px}
+.verb{padding:10px 18px;border-radius:999px;border:1px solid var(--line);font-size:15px;color:var(--ink);background:rgba(237,235,230,.03);transition:border-color .3s, background .3s}
+.verb:hover{border-color:var(--warm);background:rgba(255,122,69,.08)}
+
+/* 02 first contact */
+.contact-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:80px;align-items:center}
+.stage{perspective:1400px;position:relative}
+.frame{position:relative;transform:rotateY(-8deg) rotateX(3deg);transform-style:preserve-3d;transition:transform .8s cubic-bezier(.2,.7,.2,1)}
+.stage:hover .frame{transform:rotateY(0) rotateX(0)}
+.layer{position:absolute;inset:0;border-radius:22px;border:1px solid var(--line)}
+.layer.l1{transform:translateZ(-60px) translate(26px,22px);opacity:.5}
+.layer.l2{transform:translateZ(-120px) translate(52px,44px);opacity:.25}
+.photo{position:relative;aspect-ratio:4/3;border-radius:22px;overflow:hidden;background:radial-gradient(80% 70% at 30% 20%,rgba(143,168,255,.16),transparent 60%),radial-gradient(70% 70% at 80% 90%,rgba(255,122,69,.16),transparent 60%),#0E0F14;border:1px solid rgba(237,235,230,.18);box-shadow:0 40px 120px -30px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.02) inset;display:flex;align-items:center;justify-content:center;text-align:center}
+/* image: shown whole, at its natural proportion, never zoomed or cropped */
+.photo.has-img{aspect-ratio:auto;display:block;line-height:0}
+.photo-img{display:block;width:100%;height:auto;max-height:80vh;object-fit:contain;object-position:center;position:relative;z-index:0}
+.photo .corner{z-index:1}
+.photo-inner{display:flex;flex-direction:column;gap:12px;align-items:center;padding:24px}
+.photo-inner strong{font-family:'Geist Mono',monospace;font-weight:500;font-size:15px;letter-spacing:.14em;color:var(--ink)}
+.photo-inner span{font-size:14px;color:var(--muted)}
+.corner{position:absolute;width:22px;height:22px;border-color:var(--warm);border-style:solid;border-width:0}
+.corner.tl{top:14px;left:14px;border-top-width:1.5px;border-left-width:1.5px}
+.corner.tr{top:14px;right:14px;border-top-width:1.5px;border-right-width:1.5px}
+.corner.bl{bottom:14px;left:14px;border-bottom-width:1.5px;border-left-width:1.5px}
+.corner.br{bottom:14px;right:14px;border-bottom-width:1.5px;border-right-width:1.5px}
+.caption{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:22px;color:var(--muted)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.pill{padding:7px 12px;border-radius:999px;border:1px solid var(--line);color:var(--ink)}
+.pill.w{border-color:rgba(255,122,69,.5);color:var(--warm)}
+
+/* 03 experiments */
+.exps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;perspective:1200px}
+.exp{position:relative;border-radius:22px;padding:26px;min-height:390px;display:flex;flex-direction:column;gap:18px;background:linear-gradient(180deg,rgba(237,235,230,.045),rgba(237,235,230,.012));border:1px solid var(--line);transition:transform .5s cubic-bezier(.2,.7,.2,1), border-color .4s, box-shadow .4s;overflow:hidden}
+.exp::before{content:'';position:absolute;inset:-1px;border-radius:22px;background:radial-gradient(60% 50% at 50% 0%,rgba(255,122,69,.18),transparent 70%);opacity:0;transition:opacity .5s;pointer-events:none}
+.exp:hover{transform:translateY(-8px) rotateX(4deg);border-color:rgba(255,122,69,.45);box-shadow:0 30px 80px -30px rgba(255,122,69,.35)}
+.exp:hover::before{opacity:1}
+.exp-top{display:flex;justify-content:space-between;color:var(--muted)}
+.exp h3{margin:12px 0 0;font-size:34px;line-height:1;font-weight:600;letter-spacing:-.04em}
+.exp p{margin:0;font-size:16px;line-height:1.6;color:#B9BAB6;flex:1}
+.trail{display:flex;gap:5px;align-items:center}
+.seg{flex:1;height:6px;border-radius:3px;border:1px dashed rgba(237,235,230,.18)}
+.seg.f{border:none;background:linear-gradient(90deg,var(--cool),var(--warm));box-shadow:0 0 14px rgba(255,122,69,.35)}
+.seg.lead{animation:leadp 1.8s ease-in-out infinite}
+@keyframes leadp{0%,100%{opacity:1}50%{opacity:.45}}
+.trail-l{display:flex;justify-content:space-between;color:var(--muted)}
+.note{margin-top:28px;color:var(--muted);display:flex;gap:10px;align-items:center}
+
+/* 04 project */
+.quote{font-size:clamp(46px,6.6vw,104px);line-height:.95;font-weight:600;letter-spacing:-.05em;margin:0;max-width:1180px}
+.quote .serif{color:var(--warm);font-size:1.06em}
+.proj{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:72px;margin-top:80px}
+.pipe{position:relative;margin-top:100px;padding:56px 0 8px}
+.pipe-track{position:absolute;left:10%;right:10%;top:96px;height:1px;background:linear-gradient(90deg,var(--cool),var(--warm));opacity:.4}
+.packet{position:absolute;top:91px;left:10%;width:11px;height:11px;margin-left:-5px;border-radius:50%;background:#fff;box-shadow:0 0 18px 4px var(--warm);animation:pkt 7.5s cubic-bezier(.5,0,.5,1) infinite}
+@keyframes pkt{0%{left:10%;opacity:0}4%{opacity:1}80%{left:90%;opacity:1}88%,100%{left:90%;opacity:0}}
+.stages{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));position:relative}
+.stg{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:0 10px}
+.orb{width:84px;height:84px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#0C0D12;border:1px solid var(--line);color:#C8C9C5;position:relative;z-index:2;animation:orb 7.5s ease-out infinite}
+@keyframes orb{0%{border-color:rgba(255,122,69,.9);box-shadow:0 0 0 6px rgba(255,122,69,.10),0 0 40px rgba(255,122,69,.45);color:#fff}22%,100%{border-color:rgba(237,235,230,.12);box-shadow:none;color:#C8C9C5}}
+.orb svg{width:34px;height:34px}
+.stg h4{margin:10px 0 0;font-size:20px;font-weight:600;letter-spacing:-.02em}
+.stg p{margin:0;font-size:14px;line-height:1.5;color:var(--muted);max-width:180px}
+.ico{fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+
+/* manifesto */
+.mani{padding:200px 0;text-align:center;position:relative;overflow:hidden}
+.mani p{margin:0;font-size:clamp(46px,7.5vw,128px);line-height:.98;font-weight:600;letter-spacing:-.055em}
+.mani p + p{margin-top:12px}
+.mani .serif{color:var(--warm);font-size:1.06em}
+
+/* 05 steps */
+.rail{position:relative;margin-top:72px}
+.rail-line{position:absolute;left:0;right:0;top:9px;height:2px;background:rgba(237,235,230,.08);border-radius:2px;overflow:hidden}
+.rail-fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--cool),var(--warm));box-shadow:0 0 18px var(--warm);transition:width 1s cubic-bezier(.7,0,.2,1)}
+.steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));position:relative}
+.step{appearance:none;background:none;border:none;font:inherit;color:var(--ink);text-align:left;padding:0 12px 0 0;cursor:pointer;display:flex;flex-direction:column;gap:22px;min-height:44px}
+.step:focus-visible{outline:2px solid var(--warm);outline-offset:6px;border-radius:6px}
+.knot{width:20px;height:20px;border-radius:50%;background:#0C0D12;border:2px solid rgba(237,235,230,.2);transition:all .6s}
+.step .sn{color:#5E6066;transition:color .6s}
+.step .st{font-size:clamp(30px,4.4vw,68px);line-height:.95;font-weight:600;letter-spacing:-.05em;color:#34363B;transition:color .6s, text-shadow .6s}
+.step.lit .knot{border-color:var(--warm);background:var(--warm)}
+.step.lit .st{color:#C9CAC6}
+.step.lit .sn{color:var(--muted)}
+.step.on .knot{box-shadow:0 0 0 7px rgba(255,122,69,.15),0 0 26px var(--warm)}
+.step.on .st{color:var(--ink);text-shadow:0 0 40px rgba(255,122,69,.35)}
+.step.on .sn{color:var(--warm)}
+.step:hover .st{color:var(--ink)}
+.read{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:56px;align-items:center;margin-top:72px;padding:44px;border-radius:28px;border:1px solid var(--line);background:radial-gradient(70% 120% at 0% 0%,rgba(255,122,69,.09),transparent 60%),rgba(237,235,230,.02)}
+.read h3{margin:0;font-size:clamp(56px,7vw,112px);line-height:.9;font-weight:600;letter-spacing:-.06em}
+.read h3 .serif{color:var(--warm)}
+.read-meta{display:flex;align-items:center;gap:12px;color:var(--muted);margin-top:24px}
+.read-meta svg{flex:none}
+
+/* 06 constellation */
+.const{position:relative;height:660px;margin-top:64px}
+.const svg.lines{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.const svg.lines line{stroke:rgba(237,235,230,.12);stroke-width:1;stroke-dasharray:2 6;animation:flow 3s linear infinite}
+.core{position:absolute;left:50%;top:50%;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:1}
+.core b{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(255,122,69,.35)}
+.core b.r2{inset:-28px;border-color:rgba(143,168,255,.18);border-style:dashed}
+.core b.r3{inset:-64px;border-color:rgba(237,235,230,.06)}
+.core span{font-size:44px;font-weight:300;color:var(--warm)}
+.core .serif{font-size:56px}
+.idea{position:absolute;z-index:2;width:290px;padding:20px 22px;border-radius:18px;background:rgba(14,15,20,.75);border:1px solid var(--line);backdrop-filter:blur(10px);animation:float 9s ease-in-out infinite alternate;transition:border-color .3s}
+.idea:hover{border-color:rgba(255,122,69,.5)}
+.idea .mono{color:var(--muted)}
+.idea p{margin:10px 0 0;font-size:19px;line-height:1.3;font-weight:500;letter-spacing:-.02em}
+@keyframes float{from{transform:translateY(-8px)}to{transform:translateY(10px)}}
+
+/* 07 why */
+.question{font-size:clamp(38px,5vw,76px);line-height:1.02;font-weight:600;letter-spacing:-.045em;margin:0;max-width:1150px}
+.question .serif{color:var(--warm)}
+.chain{display:flex;flex-wrap:wrap;align-items:center;gap:0;margin:64px 0 0;position:relative}
+.cnode{padding:12px 20px;border-radius:999px;border:1px solid var(--line);font-size:16px;background:rgba(237,235,230,.03);animation:cn 6s ease-in-out infinite}
+.cnode.last{background:var(--ink);color:#06070A;border-color:var(--ink);animation:none}
+@keyframes cn{0%,100%{border-color:rgba(237,235,230,.12)}10%{border-color:rgba(255,122,69,.8);box-shadow:0 0 22px rgba(255,122,69,.25)}20%{border-color:rgba(237,235,230,.12);box-shadow:none}}
+.clink{width:36px;height:1px;background:linear-gradient(90deg,var(--cool),var(--warm));opacity:.6}
+.why{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:72px;margin-top:88px}
+.pull{font-size:clamp(26px,2.6vw,38px);line-height:1.22;font-weight:500;letter-spacing:-.03em;margin:0}
+.journey{margin-top:40px;padding:28px;border-radius:22px;border:1px solid var(--line);background:rgba(237,235,230,.02)}
+.jrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:16px;margin-top:18px}
+.jdot{width:16px;height:16px;border-radius:50%;background:var(--warm);box-shadow:0 0 20px var(--warm)}
+.jdot.open{background:transparent;border:2px solid var(--warm);box-shadow:none;animation:beacon 2.2s ease-out infinite}
+.jline{height:1px;background:linear-gradient(90deg,var(--warm),rgba(255,122,69,.15));position:relative;overflow:hidden}
+.jline::after{content:'';position:absolute;top:-1px;left:-30%;width:30%;height:3px;background:linear-gradient(90deg,transparent,#fff,transparent);animation:sweep 2.6s ease-in-out infinite}
+@keyframes sweep{to{left:100%}}
+.jlabels{display:flex;justify-content:space-between;gap:16px;margin-top:14px}
+.jlabels div{font-size:15px;color:var(--ink)}
+.jlabels div span{display:block;color:var(--muted);margin-bottom:6px}
+
+/* 08 months */
+.months-svg{display:block;width:100%;height:auto;margin-top:72px;overflow:visible}
+.m-path{fill:none;stroke:url(#gline2);stroke-width:1.5}
+.m-flow{fill:none;stroke:url(#gline2);stroke-width:2.5;stroke-dasharray:2 18;stroke-linecap:round;animation:flow 1.8s linear infinite}
+.mlab{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin-top:8px}
+.mlab div{border-top:1px solid var(--line);padding-top:18px}
+.mlab b{display:block;font-size:clamp(48px,6vw,96px);line-height:.9;font-weight:600;letter-spacing:-.06em;margin-top:8px}
+.mlab .m1 b{color:var(--cool)}
+.mlab .m2 b{background:linear-gradient(90deg,var(--cool),var(--warm));-webkit-background-clip:text;background-clip:text;color:transparent}
+.mlab .m3 b{color:var(--warm)}
+.mlab .mono{color:var(--muted)}
+
+/* 09 contact */
+.final{position:relative;padding:200px 0 60px;overflow:hidden}
+.final-title{font-size:clamp(72px,13vw,210px);line-height:.85;font-weight:700;letter-spacing:-.07em;margin:0}
+.final-title .serif{color:var(--warm);font-weight:400;font-size:1.04em}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:72px}
+.cc{display:flex;flex-direction:column;gap:16px;padding:26px;border-radius:20px;border:1px solid var(--line);text-decoration:none;color:var(--ink);background:rgba(237,235,230,.02);min-height:44px;transition:border-color .3s, background .3s, transform .3s}
+.cc:hover{border-color:rgba(255,122,69,.55);background:rgba(255,122,69,.05);transform:translateY(-4px);color:var(--ink)}
+.cc.static:hover{border-color:var(--line);background:rgba(237,235,230,.02);transform:none}
+.cc .mono{color:var(--muted)}
+.cc strong{font-size:21px;font-weight:500;letter-spacing:-.02em;word-break:break-word}
+.foot{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:140px;padding-top:24px;border-top:1px solid var(--line);color:var(--muted)}
+
+/* reveal on scroll (where supported) */
+@supports (animation-timeline: view()){
+.rv{animation:rv linear both;animation-timeline:view();animation-range:entry 0% cover 28%}
+@keyframes rv{from{opacity:0;transform:translateY(48px)}to{opacity:1;transform:none}}
+}
+
+@media (max-width:1000px){
+.hero-row,.split,.contact-grid,.proj,.why,.read{grid-template-columns:minmax(0,1fr);gap:44px}
+.exps{grid-template-columns:repeat(2,minmax(0,1fr))}
+.navlinks{display:none}
+.const{height:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.const svg.lines,.core{display:none}
+.idea{position:static;width:auto;animation:none}
+}
+@media (max-width:640px){
+.wrap{padding:0 16px}
+.sec{padding:100px 0}
+.mani{padding:120px 0}
+.final{padding:120px 0 40px}
+.legend{grid-template-columns:minmax(0,1fr);gap:20px}
+.exps,.cards,.const{grid-template-columns:minmax(0,1fr)}
+.exp{min-height:0}
+.stages{grid-template-columns:minmax(0,1fr);gap:26px}
+.stg{display:grid;grid-template-columns:64px minmax(0,1fr);column-gap:18px;row-gap:4px;text-align:left;align-items:center;padding:0}
+.stg .orb{width:64px;height:64px;grid-row:1 / span 2}
+.stg .orb svg{width:28px;height:28px}
+.stg h4{margin:0;align-self:end}
+.stg p{max-width:none;align-self:start}
+.pipe{margin-top:64px;padding-top:0}
+.pipe-track,.packet{display:none}
+.steps{grid-template-columns:minmax(0,1fr);gap:18px}
+.step{flex-direction:row;align-items:center}
+.rail-line{display:none}
+.read{padding:26px}
+.mlab{grid-template-columns:minmax(0,1fr)}
+.status{font-size:10px}
+}
+@media (prefers-reduced-motion:reduce){
+.x *,.x *::before,.x *::after{animation:none !important;transition:none !important}
+.name .f{clip-path:none}
+.cube{stroke-dashoffset:0}
+}
+</style>
+</helmet>
+
+<div class="x" style="--warm: {{warm}}; --cool: {{cool}}">
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+<div class="glow c drift" style="width: 520px; height: 520px; left: -160px; top: 380px"></div>
+<div class="glow w drift" style="width: 620px; height: 620px; right: -200px; top: 520px; animation-delay: -6s"></div>
+<div class="parts" aria-hidden="true">
+<sc-for list="{{particles}}" as="p" hint-placeholder-count="40">
+<span class="pt" style="left: {{p.x}}; top: {{p.y}}; animation-duration: {{p.d}}; animation-delay: {{p.dl}}; opacity: 0"></span>
+</sc-for>
+</div>
+
+<div class="wrap">
+<nav class="nav" aria-label="Principal">
+<div class="nav-l mono"><span class="beacon"></span><span>Gonzalo</span></div>
+<div class="navlinks mono">
+<a href="#camino">Camino</a>
+<a href="#contacto-agentes">Agentes</a>
+<a href="#proyecto">Proyecto</a>
+<a href="#contacto">Contacto</a>
+</div>
+<div class="mono" style="color: #8D8F95">Para Miriam Lao</div>
+</nav>
+
+<h1 class="name" aria-label="Gonzalo"><span class="o">GONZALO</span><span class="f" aria-hidden="true">GONZALO</span><span class="scan" aria-hidden="true"></span></h1>
+
+<div class="hero-row">
+<div>
+<p class="sub">De usar IA a <span class="serif">construir</span> con IA.</p>
+<div class="meta mono">2º SMR · Tecnología · Inteligencia Artificial</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 24px; align-items: flex-start">
+<p class="lead" style="color: #C9CAC6">Estoy empezando a descubrir todo lo que puedo construir cuando combino curiosidad, tecnología e inteligencia artificial.</p>
+<div style="display: flex; gap: 14px; flex-wrap: wrap; align-items: center">
+<a class="cta" href="#camino">Conóceme
+<svg width="18" height="18" viewBox="0 0 24 24" class="ico" aria-hidden="true"><path d="M12 5v14"></path><path d="M19 12l-7 7-7-7"></path></svg>
+</a>
+<span class="status mono"><span class="beacon"></span>Empezando, pero ya construyendo</span>
+</div>
+</div>
+</div>
+
+<!-- living circuit -->
+<div class="circuit" aria-label="Mi evolución: usar, entender, construir">
+<svg viewBox="0 0 1200 420" aria-hidden="true">
+<defs>
+<linearGradient id="gline" x1="0" y1="0" x2="1200" y2="0" gradientUnits="userSpaceOnUse">
+<stop offset="0" stop-color="{{cool}}"></stop>
+<stop offset="0.5" stop-color="#C9B8D8"></stop>
+<stop offset="1" stop-color="{{warm}}"></stop>
+</linearGradient>
+<radialGradient id="halo">
+<stop offset="0" stop-color="{{warm}}" stop-opacity="0.35"></stop>
+<stop offset="1" stop-color="{{warm}}" stop-opacity="0"></stop>
+</radialGradient>
+<radialGradient id="haloc">
+<stop offset="0" stop-color="{{cool}}" stop-opacity="0.3"></stop>
+<stop offset="1" stop-color="{{cool}}" stop-opacity="0"></stop>
+</radialGradient>
+</defs>
+
+<!-- secondary network, denser towards CONSTRUIR -->
+<g>
+<line class="c-thin" x1="120" y1="290" x2="210" y2="350"></line>
+<line class="c-thin" x1="120" y1="290" x2="70" y2="210"></line>
+<line class="c-thin" x1="600" y1="170" x2="520" y2="70"></line>
+<line class="c-thin" x1="600" y1="170" x2="690" y2="80"></line>
+<line class="c-thin" x1="600" y1="170" x2="470" y2="290"></line>
+<line class="c-thin" x1="690" y1="80" x2="800" y2="110"></line>
+<line class="c-thin" x1="520" y1="70" x2="690" y2="80"></line>
+<line class="c-thin" x1="1080" y1="220" x2="980" y2="90"></line>
+<line class="c-thin" x1="1080" y1="220" x2="1170" y2="110"></line>
+<line class="c-thin" x1="1080" y1="220" x2="1160" y2="360"></line>
+<line class="c-thin" x1="1080" y1="220" x2="960" y2="380"></line>
+<line class="c-thin" x1="980" y1="90" x2="1170" y2="110"></line>
+<line class="c-thin" x1="980" y1="90" x2="800" y2="110"></line>
+<line class="c-thin" x1="960" y1="380" x2="1160" y2="360"></line>
+<line class="c-thin" x1="862" y1="262" x2="960" y2="380"></line>
+<circle class="c-mini" cx="210" cy="350" r="2"></circle>
+<circle class="c-mini" cx="70" cy="210" r="2"></circle>
+<circle class="c-mini" cx="520" cy="70" r="2.5"></circle>
+<circle class="c-mini" cx="690" cy="80" r="2.5"></circle>
+<circle class="c-mini" cx="470" cy="290" r="2"></circle>
+<circle class="c-mini" cx="800" cy="110" r="2.5"></circle>
+<circle class="c-mini" cx="980" cy="90" r="3"></circle>
+<circle class="c-mini" cx="1170" cy="110" r="3"></circle>
+<circle class="c-mini" cx="1160" cy="360" r="3"></circle>
+<circle class="c-mini" cx="960" cy="380" r="3"></circle>
+</g>
+
+<!-- main path -->
+<path id="hp" class="c-base" d="M120 290 C 300 290, 360 130, 600 170 S 900 350, 1080 220"></path>
+<path class="c-main" d="M120 290 C 300 290, 360 130, 600 170 S 900 350, 1080 220"></path>
+<path class="c-flow" d="M120 290 C 300 290, 360 130, 600 170 S 900 350, 1080 220"></path>
+
+<!-- packets of light travelling the path -->
+<circle r="4" fill="#ffffff"><animateMotion dur="5s" repeatCount="indefinite" rotate="auto"><mpath href="#hp"></mpath></animateMotion></circle>
+<circle r="3" fill="{{warm}}"><animateMotion dur="5s" begin="1.7s" repeatCount="indefinite"><mpath href="#hp"></mpath></animateMotion></circle>
+<circle r="3" fill="{{cool}}"><animateMotion dur="5s" begin="3.4s" repeatCount="indefinite"><mpath href="#hp"></mpath></animateMotion></circle>
+
+<!-- 01 USAR -->
+<circle cx="120" cy="290" r="60" fill="url(#haloc)"></circle>
+<circle cx="120" cy="290" r="9" fill="{{cool}}"></circle>
+<circle cx="120" cy="290" r="20" class="c-ring"></circle>
+<text x="120" y="350" text-anchor="middle" class="c-label">01</text>
+
+<!-- 02 ENTENDER : orbiting rings -->
+<circle cx="600" cy="170" r="80" fill="url(#haloc)"></circle>
+<circle cx="600" cy="170" r="10" fill="#EDEBE6"></circle>
+<circle cx="600" cy="170" r="26" class="c-ring"></circle>
+<circle cx="600" cy="170" r="40" class="c-dash spin" stroke="#C9B8D8"></circle>
+<circle cx="600" cy="170" r="54" class="c-dash spin r" stroke="{{cool}}"></circle>
+<text x="600" y="258" text-anchor="middle" class="c-label">02</text>
+
+<!-- you are here -->
+<circle cx="862" cy="262" r="6" fill="{{warm}}"></circle>
+<circle cx="862" cy="262" r="6" fill="none" stroke="{{warm}}" stroke-width="1.5">
+<animate attributeName="r" values="6;22" dur="2s" repeatCount="indefinite"></animate>
+<animate attributeName="opacity" values="1;0" dur="2s" repeatCount="indefinite"></animate>
+</circle>
+<text x="862" y="300" text-anchor="middle" class="c-here">ESTOY AQUÍ</text>
+
+<!-- 03 CONSTRUIR : a cube assembling itself -->
+<circle cx="1080" cy="220" r="110" fill="url(#halo)"></circle>
+<path class="cube-ghost" d="M1080 150 L1141 185 L1141 255 L1080 290 L1019 255 L1019 185 Z M1019 185 L1080 220 L1141 185 M1080 220 L1080 290"></path>
+<path class="cube-face" d="M1080 150 L1141 185 L1080 220 L1019 185 Z"></path>
+<path class="cube" pathLength="1" d="M1019 185 L1080 150 L1141 185 L1080 220 Z"></path>
+<path class="cube d2" pathLength="1" d="M1019 185 L1019 255 L1080 290 L1080 220"></path>
+<path class="cube d3" pathLength="1" d="M1141 185 L1141 255 L1080 290"></path>
+<text x="1080" y="330" text-anchor="middle" class="c-label">03</text>
+</svg>
+
+<div class="legend">
+<div>
+<div class="mono">01 · Punto de partida</div>
+<h3>Usar</h3>
+<p>Herramientas de IA que respondían a mis preguntas.</p>
+</div>
+<div>
+<div class="mono">02 · Donde estoy</div>
+<h3>Entender</h3>
+<p>Cómo funcionan, qué posibilidades tienen y cómo plantearles bien un problema.</p>
+</div>
+<div class="now">
+<div class="mono">03 · Hacia donde voy</div>
+<h3>Construir</h3>
+<p>Convertir ideas en cosas reales. Ya he empezado.</p>
+</div>
+</div>
+</div>
+</div>
+</header>
+
+<!-- ================= 01 ================= -->
+<section class="sec" id="camino">
+<div class="wrap">
+<div class="kick mono"><b>01</b><i></i><span>Punto de partida</span></div>
+<div class="split">
+<div class="rv">
+<h2 class="h2">No quiero quedarme en <span class="serif">usarla.</span></h2>
+<p class="lead" style="margin-top: 36px">Durante este año he pasado de simplemente usar herramientas de IA a intentar entender cómo funcionan y qué posibilidades tienen.</p>
+<p class="body" style="margin-top: 20px">Y he descubierto que la IA puede ser mucho más que una herramienta para responder preguntas. No digo que ya lo domine: es el camino que estoy empezando a recorrer. Quiero aprender a usarla para:</p>
+<div class="verbs">
+<span class="verb">construir</span>
+<span class="verb">automatizar</span>
+<span class="verb">experimentar</span>
+<span class="verb">resolver problemas</span>
+<span class="verb">convertir ideas en proyectos</span>
+</div>
+</div>
+<div class="morph rv" aria-label="Transformación: preguntar, experimentar, construir">
+<div class="morph-grid"></div>
+<sc-for list="{{dots}}" as="d" hint-placeholder-count="16">
+<span class="md" style="{{d.style}}"></span>
+</sc-for>
+<div class="phases mono">
+<sc-for list="{{phases}}" as="ph" hint-placeholder-count="3">
+<span class="{{ph.cls}}">{{ph.label}}</span>
+</sc-for>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ================= 02 ================= -->
+<section class="sec" id="contacto-agentes">
+<div class="glow c" style="width: 480px; height: 480px; left: 10%; top: 20%; opacity: .12"></div>
+<div class="wrap">
+<div class="kick mono"><b>02</b><i></i><span>Primer contacto con los agentes</span></div>
+<div class="contact-grid">
+<div class="stage rv">
+<div class="frame">
+<div class="layer l2"></div>
+<div class="layer l1"></div>
+<div class="photo has-img">
+<span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+<!-- PON AQUÍ LA RUTA DE TU IMAGEN -->
+<img class="photo-img" src="images/miriam-lao.jpeg" alt="Imagen de bienvenida de la formación de agentes de IA de Miriam Lao" loading="lazy">
+</div>
+</div>
+<div class="caption mono">
+<span>Primer contacto · Formación de agentes de IA · Miriam Lao</span>
+</div>
+</div>
+<div class="rv">
+<div class="chips mono" style="margin-bottom: 28px"><span class="pill w">Primer contacto</span><span class="pill">Formación</span><span class="pill">≈ 2 horas</span></div>
+<h2 class="h2" style="font-size: clamp(38px, 4.4vw, 66px)">Uno de mis primeros contactos prácticos con los agentes de IA fue a través de una formación de <span class="serif">Miriam Lao.</span></h2>
+<p class="lead" style="margin-top: 32px; color: #C9CAC6">Durante la formación aprendí los fundamentos para crear agentes y empecé a entender de forma práctica qué pueden llegar a hacer.</p>
+<p class="body" style="margin-top: 18px">Fue una formación corta, centrada precisamente en aprender a crear agentes y entender sus posibilidades. Un punto de partida, no una meta.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ================= 03 ================= -->
+<section class="sec">
+<div class="wrap">
+<div class="kick mono"><b>03</b><i></i><span>Lo que ya he empezado a probar</span></div>
+<div style="display: flex; justify-content: space-between; align-items: end; gap: 32px; flex-wrap: wrap; margin-bottom: 56px" class="rv">
+<h2 class="h2">Primeros <span class="serif">experimentos.</span></h2>
+<p class="body" style="max-width: 400px">Nada de esto es experiencia profesional. Son cosas que he probado por mi cuenta, con resultados y errores incluidos.</p>
+</div>
+<div class="exps">
+<article class="exp rv">
+<div class="exp-top mono"><span>EXP · 01</span><span>activo</span></div>
+<h3>Prompting</h3>
+<p>He aprendido que saber pedir algo bien puede cambiar completamente el resultado.</p>
+<div class="trail" aria-hidden="true"><span class="seg f"></span><span class="seg f"></span><span class="seg f lead"></span><span class="seg"></span><span class="seg"></span></div>
+<div class="trail-l mono"><span>Recorrido</span><span>en práctica</span></div>
+</article>
+<article class="exp rv">
+<div class="exp-top mono"><span>EXP · 02</span><span>activo</span></div>
+<h3>Agentes de IA</h3>
+<p>He empezado a experimentar con agentes de IA y a entender cómo pueden realizar tareas siguiendo instrucciones y objetivos.</p>
+<div class="trail" aria-hidden="true"><span class="seg f lead"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span></div>
+<div class="trail-l mono"><span>Recorrido</span><span>primeros pasos</span></div>
+</article>
+<article class="exp rv">
+<div class="exp-top mono"><span>EXP · 03</span><span>activo</span></div>
+<h3>Proyectos</h3>
+<p>He utilizado IA para convertir ideas en proyectos reales, especialmente en desarrollo web.</p>
+<div class="trail" aria-hidden="true"><span class="seg f"></span><span class="seg f lead"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span></div>
+<div class="trail-l mono"><span>Recorrido</span><span>empezando</span></div>
+</article>
+<article class="exp rv">
+<div class="exp-top mono"><span>EXP · 04</span><span>siempre</span></div>
+<h3>Investigación</h3>
+<p>Me gusta investigar por mi cuenta, probar herramientas nuevas y descubrir hasta dónde puedo llevarlas.</p>
+<div class="trail" aria-hidden="true"><span class="seg f"></span><span class="seg f lead"></span><span class="seg"></span><span class="seg"></span><span class="seg"></span></div>
+<div class="trail-l mono"><span>Recorrido</span><span>curiosidad</span></div>
+</article>
+</div>
+<p class="note mono"><span class="beacon"></span>Las barras no miden un nivel: marcan el tramo del camino que llevo recorrido.</p>
+</div>
+</section>
+
+<!-- ================= 04 ================= -->
+<section class="sec" id="proyecto">
+<div class="glow w" style="width: 560px; height: 560px; right: -120px; top: 10%; opacity: .12"></div>
+<div class="wrap">
+<div class="kick mono"><b>04</b><i></i><span>Un proyecto real · Keisho</span></div>
+<p class="quote rv">“Más que aprender a pedirle código a una IA, <span class="serif">aprendí a trabajar con ella.</span>”</p>
+
+<div class="proj">
+<p class="lead">Uno de mis proyectos más grandes de este año ha sido la creación de una web completa para Keisho.</p>
+<p class="body">Utilicé IA para investigar, plantear soluciones, generar y modificar código y avanzar en el proyecto. Después revisé personalmente los resultados, añadí contenido e imágenes, detecté cosas que quería cambiar y fui iterando hasta conseguir el resultado que buscaba.</p>
+</div>
+
+<div class="pipe" aria-label="Proceso: idea, IA, código, revisión, resultado">
+<div class="pipe-track"></div>
+<div class="packet"></div>
+<div class="stages">
+<div class="stg">
+<div class="orb" style="animation-delay: 0s"><svg viewBox="0 0 32 32" class="ico" aria-hidden="true"><circle cx="16" cy="16" r="3"></circle><circle cx="16" cy="16" r="9" stroke-dasharray="2 4"></circle></svg></div>
+<h4>Idea</h4><p>Lo que quiero conseguir.</p>
+</div>
+<div class="stg">
+<div class="orb" style="animation-delay: 1.5s"><svg viewBox="0 0 32 32" class="ico" aria-hidden="true"><circle cx="16" cy="16" r="3"></circle><path d="M16 5a11 11 0 0 1 11 11"></path><path d="M16 27A11 11 0 0 1 5 16"></path><path d="M16 9.5a6.5 6.5 0 0 1 6.5 6.5"></path><path d="M16 22.5A6.5 6.5 0 0 1 9.5 16"></path></svg></div>
+<h4>IA</h4><p>Investigar y plantear soluciones.</p>
+</div>
+<div class="stg">
+<div class="orb" style="animation-delay: 3s"><svg viewBox="0 0 32 32" class="ico" aria-hidden="true"><path d="M7 10h12"></path><path d="M11 16h14"></path><path d="M7 22h9"></path></svg></div>
+<h4>Código</h4><p>Generar y modificar.</p>
+</div>
+<div class="stg">
+<div class="orb" style="animation-delay: 4.5s"><svg viewBox="0 0 32 32" class="ico" aria-hidden="true"><path d="M7 10h10"></path><path d="M7 16h7"></path><path d="M7 22h6"></path><path d="M18 20l3 3 6-7"></path></svg></div>
+<h4>Revisión</h4><p>Reviso, añado contenido y detecto qué cambiar.</p>
+</div>
+<div class="stg">
+<div class="orb" style="animation-delay: 6s"><svg viewBox="0 0 32 32" class="ico" aria-hidden="true"><rect x="6" y="7" width="20" height="18" rx="3"></rect><path d="M6 12h20"></path><rect x="10" y="16" width="7" height="5" rx="1"></rect></svg></div>
+<h4>Resultado</h4><p>Lo que buscaba, tras varias vueltas.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ================= MANIFESTO ================= -->
+<section class="mani">
+<div class="glow w drift" style="width: 700px; height: 400px; left: 50%; top: 50%; margin: -200px 0 0 -350px; opacity: .14"></div>
+<div class="wrap rv">
+<p>No sé hacerlo todo.</p>
+<p>Pero quiero descubrir <span class="serif">cómo hacerlo.</span></p>
+</div>
+</section>
+
+<!-- ================= 05 ================= -->
+<section class="sec">
+<div class="wrap">
+<div class="kick mono"><b>05</b><i></i><span>De una idea a algo real</span></div>
+<h2 class="h2 rv">Así pienso cuando<br>me pongo a <span class="serif">construir.</span></h2>
+<div class="rail">
+<div class="rail-line"><div class="rail-fill" style="width: {{railW}}"></div></div>
+<div class="steps" role="group" aria-label="Proceso de trabajo">
+<sc-for list="{{steps}}" as="s" hint-placeholder-count="5">
+<button type="button" class="{{s.cls}}" onClick="{{s.pick}}" aria-pressed="{{s.on}}"><span class="knot"></span><span class="sn mono">{{s.num}}</span><span class="st">{{s.title}}</span></button>
+</sc-for>
+</div>
+</div>
+<div class="read" aria-live="polite">
+<div>
+<div class="mono" style="color: #8D8F95; margin-bottom: 16px">Paso {{active.num}} / 05</div>
+<h3>{{active.title}}<span class="serif">.</span></h3>
+</div>
+<div>
+<p class="lead">{{active.text}}</p>
+<div class="read-meta mono">
+<svg width="20" height="20" viewBox="0 0 24 24" class="ico" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"></path><path d="M21 4v5h-5"></path></svg>
+<span>No espero que la primera versión sea perfecta.</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ================= 06 ================= -->
+<section class="sec">
+<div class="wrap">
+<div class="kick mono"><b>06</b><i></i><span>Lo que quiero descubrir</span></div>
+<div class="split rv" style="align-items: end">
+<h2 class="h2">Ahora quiero ir <span class="serif">más allá.</span></h2>
+<p class="lead" style="color: #C9CAC6">No son cosas que ya sepa hacer. Son hacia donde quiero llevar mi curiosidad.</p>
+</div>
+<div class="const">
+<svg class="lines" aria-hidden="true">
+<line x1="50%" y1="50%" x2="16%" y2="16%"></line>
+<line x1="50%" y1="50%" x2="72%" y2="11%"></line>
+<line x1="50%" y1="50%" x2="84%" y2="50%"></line>
+<line x1="50%" y1="50%" x2="68%" y2="88%"></line>
+<line x1="50%" y1="50%" x2="18%" y2="84%"></line>
+<line x1="50%" y1="50%" x2="12%" y2="50%"></line>
+</svg>
+<div class="core" aria-hidden="true"><b class="r3"></b><b class="r2 spin"></b><b></b><span class="serif">?</span></div>
+<div class="idea" style="left: 4%; top: 6%"><span class="mono">Posibilidad · 01</span><p>Entender mejor los agentes de IA</p></div>
+<div class="idea" style="left: 60%; top: 2%; animation-delay: -2s"><span class="mono">Posibilidad · 02</span><p>Conectar herramientas</p></div>
+<div class="idea" style="left: 74%; top: 42%; animation-delay: -4s"><span class="mono">Posibilidad · 03</span><p>Automatizar tareas</p></div>
+<div class="idea" style="left: 56%; top: 80%; animation-delay: -6s"><span class="mono">Posibilidad · 04</span><p>Resolver problemas concretos</p></div>
+<div class="idea" style="left: 6%; top: 77%; animation-delay: -3s"><span class="mono">Posibilidad · 05</span><p>Pasar de una idea a una solución funcional</p></div>
+<div class="idea" style="left: 0%; top: 42%; animation-delay: -5s"><span class="mono">Posibilidad · 06</span><p>Aplicar IA a proyectos reales</p></div>
+</div>
+</div>
+</section>
+
+<!-- ================= 07 ================= -->
+<section class="sec">
+<div class="glow c" style="width: 520px; height: 520px; left: -140px; top: 30%; opacity: .1"></div>
+<div class="wrap">
+<div class="kick mono"><b>07</b><i></i><span>¿Por qué Miriam?</span></div>
+<p class="question">¿Qué puede llegar a hacer una persona cuando aprende a utilizar la IA para <span class="serif">construir soluciones reales?</span></p>
+
+<div class="chain" aria-label="Inteligencia artificial, agentes, automatización, problemas reales, negocio, soluciones">
+<span class="cnode" style="animation-delay: 0s">Inteligencia artificial</span><span class="clink"></span>
+<span class="cnode" style="animation-delay: .6s">Agentes</span><span class="clink"></span>
+<span class="cnode" style="animation-delay: 1.2s">Automatización</span><span class="clink"></span>
+<span class="cnode" style="animation-delay: 1.8s">Problemas reales</span><span class="clink"></span>
+<span class="cnode" style="animation-delay: 2.4s">Negocio</span><span class="clink"></span>
+<span class="cnode last">Soluciones</span>
+</div>
+
+<div class="why">
+<div>
+<p class="pull">Lo que más me llama la atención de vuestro trabajo es que la IA no se queda en la teoría. Está planteada como una herramienta para <span class="serif" style="color: var(--warm)">construir, automatizar y resolver problemas reales.</span></p>
+</div>
+<div>
+<p class="body" style="font-size: 18px; color: #D6D6D1">Además, ya tuve un primer contacto con este enfoque a través de una formación de agentes de IA de Miriam, donde pude empezar a experimentar de forma práctica con este tipo de herramientas.</p>
+<p class="lead" style="margin-top: 22px; font-weight: 500">Y precisamente eso es lo que quiero aprender a hacer cada vez mejor.</p>
+<div class="journey">
+<div class="mono" style="color: #8D8F95">Continuación natural</div>
+<div class="jrow"><span class="jdot"></span><span class="jline"></span><span class="jdot open"></span></div>
+<div class="jlabels">
+<div><span class="mono">Ya</span>Primer contacto · formación</div>
+<div style="text-align: right"><span class="mono">Ahora</span>Seguir profundizando</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ================= 08 ================= -->
+<section class="sec">
+<div class="wrap">
+<div class="kick mono"><b>08</b><i></i><span>Prácticas · 3 meses</span></div>
+<h2 class="h2" style="max-width: 1100px">Tres meses para descubrir hasta dónde <span class="serif">puedo llegar.</span></h2>
+<div class="split" style="margin-top: 48px; align-items: start">
+<p class="lead">Busco unas prácticas en las que pueda aprender, aportar desde lo que ya sé y, sobre todo, enfrentarme a proyectos y problemas que me obliguen a pensar de otra manera.</p>
+<p class="lead" style="font-weight: 600">Estoy empezando. Y precisamente por eso tengo muchas ganas de aprender.</p>
+</div>
+
+<svg class="months-svg" viewBox="0 0 1200 260" aria-hidden="true">
+<defs>
+<linearGradient id="gline2" x1="0" y1="0" x2="1200" y2="0" gradientUnits="userSpaceOnUse">
+<stop offset="0" stop-color="{{cool}}"></stop>
+<stop offset="1" stop-color="{{warm}}"></stop>
+</linearGradient>
+</defs>
+<path id="mp" class="m-path" d="M200 210 C 400 210, 420 140, 600 140 S 860 50, 1000 50"></path>
+<path class="m-flow" d="M200 210 C 400 210, 420 140, 600 140 S 860 50, 1000 50"></path>
+<circle r="4" fill="#ffffff"><animateMotion dur="4.5s" repeatCount="indefinite"><mpath href="#mp"></mpath></animateMotion></circle>
+<!-- mes 01: a single point -->
+<circle cx="200" cy="210" r="7" fill="{{cool}}"></circle>
+<!-- mes 02: point + ring -->
+<circle cx="600" cy="140" r="8" fill="#C9B8D8"></circle>
+<circle cx="600" cy="140" r="20" fill="none" stroke="#C9B8D8" stroke-opacity="0.5" stroke-width="1"></circle>
+<!-- mes 03: point + two rings + orbit -->
+<circle cx="1000" cy="50" r="9" fill="{{warm}}"></circle>
+<circle cx="1000" cy="50" r="22" fill="none" stroke="{{warm}}" stroke-opacity="0.55" stroke-width="1"></circle>
+<circle cx="1000" cy="50" r="38" class="c-dash spin" stroke="{{warm}}" stroke-opacity="0.45"></circle>
+<circle r="3" fill="{{warm}}"><animateMotion dur="6s" repeatCount="indefinite" path="M1000 12 A38 38 0 1 1 999.9 12"></animateMotion></circle>
+</svg>
+<div class="mlab">
+<div class="m1"><span class="mono">Mes</span><b>01</b></div>
+<div class="m2"><span class="mono">Mes</span><b>02</b></div>
+<div class="m3"><span class="mono">Mes</span><b>03</b></div>
+</div>
+</div>
+</section>
+
+<!-- ================= 09 ================= -->
+<section class="final" id="contacto">
+<div class="glow w drift" style="width: 760px; height: 760px; left: 50%; bottom: -420px; margin-left: -380px; opacity: .2"></div>
+<div class="glow c" style="width: 420px; height: 420px; left: -120px; top: 80px; opacity: .1"></div>
+<div class="wrap">
+<div class="kick mono"><b>09</b><i></i><span>Contacto</span></div>
+<h2 class="final-title rv">¿Construimos<br><span class="serif">algo?</span></h2>
+<p class="lead rv" style="margin-top: 36px; max-width: 620px; color: #C9CAC6">Si crees que puedo encajar, me encantará hablar. Escríbeme por donde te resulte más cómodo.</p>
+<div class="cards">
+<!-- CONTACTO · EMAIL: cambia TU_EMAIL@gmail.com en el enlace (abre la redacción de Gmail) y en el texto visible -->
+<a class="cc" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=gonzalodiazmoya9@gmail.com" target="_blank" rel="noopener"><span class="mono">Email</span><strong>gonzalodiazmoya9@gmail.com</strong></a>
+<!-- CONTACTO · TELÉFONO: solo se muestra, no es un enlace -->
+<div class="cc static"><span class="mono">Teléfono</span><strong>622282623</strong></div>
+<!-- CONTACTO · INSTAGRAM: cambia TU_USUARIO en el enlace y en el texto visible -->
+<a class="cc" href="https://www.instagram.com/gonzaloodiaazz/" target="_blank" rel="noopener"><span class="mono">Instagram</span><strong>gonzaloodiaazz</strong></a>
+</div>
+<div style="margin-top: 44px">
+<!-- BOTÓN ESCRÍBEME: mismo enlace de Gmail que el email de arriba (cambia TU_EMAIL@gmail.com) -->
+<a class="cta w" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=gonzalodiazmoya9@gmail.com" target="_blank" rel="noopener">Escríbeme
+<svg width="18" height="18" viewBox="0 0 24 24" class="ico" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+</a>
+</div>
+<div class="foot mono"><span>Gonzalo · 2026</span><span>Hecha para Miriam Lao</span><span>Esta página también es algo que he construido</span></div>
+</div>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"warm":{"editor":"color","default":"#FF7A45","options":["#FF7A45","#F5C451","#FF5C8A","#7CE0B8"]},"cool":{"editor":"color","default":"#8FA8FF","options":["#8FA8FF","#B9A4FF","#7FD1E8","#C9CAC6"]},"$preview":{"width":1440,"height":9200}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { step: 0, manual: false, phase: 0 };
+  }
+  componentDidMount() {
+    var self = this;
+    this.stepTimer = setInterval(function () {
+      if (!self.state.manual) self.setState({ step: (self.state.step + 1) % 5 });
+    }, 2800);
+    this.phaseTimer = setInterval(function () {
+      self.setState({ phase: (self.state.phase + 1) % 3 });
+    }, 3200);
+  }
+  componentWillUnmount() {
+    clearInterval(this.stepTimer);
+    clearInterval(this.phaseTimer);
+  }
+  renderVals() {
+    var warm = this.props.warm ?? '#FF7A45';
+    var cool = this.props.cool ?? '#8FA8FF';
+    var self = this;
+
+    // deterministic pseudo-random
+    var seed = 7;
+    function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+
+    var particles = [];
+    for (var i = 0; i < 40; i++) {
+      particles.push({
+        x: (rnd() * 100).toFixed(2) + '%',
+        y: (20 + rnd() * 80).toFixed(2) + '%',
+        d: (7 + rnd() * 9).toFixed(1) + 's',
+        dl: (-rnd() * 14).toFixed(1) + 's'
+      });
+    }
+
+    // morph: preguntar -> experimentar -> construir
+    var phase = this.state.phase;
+    var scatter = [];
+    for (var k = 0; k < 16; k++) scatter.push([10 + rnd() * 80, 12 + rnd() * 66]);
+    var dots = [];
+    for (var j = 0; j < 16; j++) {
+      var x, y, col, glow;
+      if (phase === 0) {
+        x = 14 + j * (72 / 15); y = 44;
+        col = cool; glow = '0 0 10px ' + cool;
+      } else if (phase === 1) {
+        x = scatter[j][0]; y = scatter[j][1];
+        col = j % 2 ? cool : warm; glow = '0 0 14px ' + col;
+      } else {
+        var r = Math.floor(j / 4), c = j % 4;
+        x = 50 + (c - r) * 10.5; y = 16 + (c + r) * 9.5;
+        col = warm; glow = '0 0 18px ' + warm;
+      }
+      dots.push({ style: 'left: ' + x.toFixed(2) + '%; top: ' + y.toFixed(2) + '%; background: ' + col + '; box-shadow: ' + glow + '; transition-delay: ' + (j * 35) + 'ms' });
+    }
+    var phaseNames = ['Preguntar', 'Experimentar', 'Construir'];
+    var phases = phaseNames.map(function (n, i) {
+      return { label: '0' + (i + 1) + ' ' + n, cls: i === phase ? 'ph on' : 'ph' };
+    });
+
+    // steps
+    var STEPS = [
+      { title: 'Pensar', text: 'Antes de abrir ninguna herramienta, intento entender qué problema quiero resolver y qué necesito de verdad.' },
+      { title: 'Probar', text: 'Hago una primera versión rápida, aunque sea imperfecta. Lo importante es tener algo real con lo que trabajar.' },
+      { title: 'Romper', text: 'Casi siempre algo falla. Y muchas veces es justo ahí cuando más entiendo cómo funciona lo que estoy haciendo.' },
+      { title: 'Ajustar', text: 'Cambio el enfoque, reformulo lo que le pido a la IA, reviso el resultado y corrijo lo que no me convence.' },
+      { title: 'Construir', text: 'Cuando por fin funciona, se convierte en algo que se puede usar. Y normalmente aparece la siguiente idea.' }
+    ];
+    var cur = this.state.step;
+    var steps = STEPS.map(function (s, i) {
+      var cls = 'step';
+      if (i <= cur) cls += ' lit';
+      if (i === cur) cls += ' on';
+      return {
+        title: s.title,
+        num: '0' + (i + 1),
+        cls: cls,
+        on: i === cur ? 'true' : 'false',
+        pick: function () { self.setState({ step: i, manual: true }); }
+      };
+    });
+
+    return {
+      warm: warm,
+      cool: cool,
+      particles: particles,
+      dots: dots,
+      phases: phases,
+      steps: steps,
+      railW: (cur * 20 + 1) + '%',
+      active: { title: STEPS[cur].title, text: STEPS[cur].text, num: '0' + (cur + 1) }
+    };
+  }
+}
+</script>
+</body>
+</html>
